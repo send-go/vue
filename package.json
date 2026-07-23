@@ -1,0 +1,33 @@
+{
+  "name": "@sendgo/vue",
+  "version": "1.0.0",
+  "description": "Sendgo Vue.js SDK — 카카오 알림톡/친구톡, SMS/LMS/MMS (Nuxt / Server Routes)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["sendgo", "vue", "nuxt", "kakao", "alimtalk", "sms", "korea"],
+  "author": "Sendgo <dev@sendgo.io>",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": ">=3.4.0",
+    "@sendgo/node": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0",
+    "vue": "^3.4.0",
+    "@sendgo/node": "^1.0.0"
+  },
+  "engines": {"node": ">=18"}
+}
