@@ -1,7 +1,8 @@
 name: Publish to npm
 
 # vX.Y.Z 태그 push, GitHub Release 게시, 또는 수동 실행 시 npm 으로 배포합니다.
-# secrets.NPM_TOKEN (npm Automation 토큰) 사용 — 2FA 우회.
+# npm Trusted Publishing(OIDC) 사용 — 장기 토큰 불필요. 프로버넌스 자동 생성.
+# 사전 조건: npmjs.com 각 패키지 설정에 Trusted Publisher(GitHub Actions, 이 repo, publish.yml) 등록.
 on:
   workflow_dispatch:
   push:
@@ -13,13 +14,19 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write        # OIDC 토큰 발급(Trusted Publishing 필수)
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "22"                       # >= 22.14 (Trusted Publishing 요구)
           registry-url: "https://registry.npmjs.org"
+
+      - name: npm 최신화 (Trusted Publishing 요구: npm >= 11.5.1)
+        run: npm install -g npm@latest
 
       - name: 의존성 설치
         run: npm install --no-audit --no-fund
@@ -27,7 +34,5 @@ jobs:
       - name: 빌드 (tsc)
         run: npm run build
 
-      - name: npm 배포
+      - name: npm 배포 (OIDC)
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
