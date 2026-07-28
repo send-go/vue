@@ -1,0 +1,33 @@
+name: Publish to npm
+
+# vX.Y.Z 태그 push, GitHub Release 게시, 또는 수동 실행 시 npm 으로 배포합니다.
+# secrets.NPM_TOKEN (npm Automation 토큰) 사용 — 2FA 우회.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: 의존성 설치
+        run: npm install --no-audit --no-fund
+
+      - name: 빌드 (tsc)
+        run: npm run build
+
+      - name: npm 배포
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
