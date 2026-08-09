@@ -25,7 +25,7 @@ jobs:
           node-version: "22"                       # >= 22.14 (Trusted Publishing 요구)
           registry-url: "https://registry.npmjs.org"
 
-      - name: npm 최신화 (Trusted Publishing 요구: npm >= 11.5.1)
+      - name: "npm 최신화 (Trusted Publishing 요구: npm >= 11.5.1)"
         run: npm install -g npm@latest
 
       - name: 의존성 설치
