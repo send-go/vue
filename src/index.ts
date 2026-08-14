@@ -1,5 +1,8 @@
 export { SendgoPlugin, SENDGO_KEY, Sendgo } from './plugin';
 export { useAlimtalk } from './composables/useAlimtalk';
+export { useBrandMessage } from './composables/useBrandMessage';
+export type { UseAlimtalkReturn } from './composables/useAlimtalk';
+export type { UseBrandMessageReturn } from './composables/useBrandMessage';
 
 export type {
   ShortUrlParams,

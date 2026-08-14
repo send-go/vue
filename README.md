@@ -1,6 +1,6 @@
 # @sendgo/vue
 
-> **Vue.js / Nuxt 3에서 카카오 알림톡, 친구톡, SMS를 발송하는 공식 Vue SDK**
+> **Vue.js / Nuxt 3에서 카카오 알림톡, 브랜드메시지, SMS를 발송하는 공식 Vue SDK**
 
 [![npm](https://img.shields.io/npm/v/@sendgo/vue)](https://www.npmjs.com/package/@sendgo/vue)
 [![Vue](https://img.shields.io/badge/Vue-3.4+-green)](https://vuejs.org)
@@ -177,19 +177,26 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 ---
 
-## useFriendtalk 훅
+## useBrandMessage 훅
+
+브랜드메시지는 친구톡의 후속 채널입니다. 친구톡은 카카오 정책에 따라 **2025-12-31 종료**되었고,
+2026-01-01 부터 친구톡 발송 요청은 카카오 측에서 브랜드메시지(자유형)로 자동 대체 발송됩니다.
+**v2 전용**입니다.
 
 ```vue
 <script setup lang="ts">
-import { useFriendtalk } from '@sendgo/vue';
+import { useBrandMessage } from '@sendgo/vue';
 
-const { send, loading, error } = useFriendtalk(
-  (params) => $fetch('/api/friendtalk', { method: 'POST', body: params })
+const { send, loading, error } = useBrandMessage(
+  (params) => $fetch('/api/brand-message', { method: 'POST', body: params })
 );
 
 const sendPromo = () => send({
-  content:  '🎉 7월 한정 특가! 지금 바로 확인하세요.',
-  contacts: [{ contact: '01012345678' }],
+  targeting:          'M',
+  messageType:        'FT',
+  friendTemplateUuid: '9cd5460b-6458-4edc-9b11-c26d3013c340',
+  content:            '🎉 7월 한정 특가! 지금 바로 확인하세요.',
+  contacts:           [{ contact: '01012345678' }],
 });
 </script>
 
@@ -234,6 +241,15 @@ const sendPromo = () => send({
 [SDK 가이드](https://sendgo.io/ko/sdk) 를 참고하세요.
 
 ## 변경 사항
+
+### 1.2.0 (2026-08-14)
+
+- **친구톡 Deprecated 표기** — 친구톡은 카카오 정책에 따라 2025-12-31 종료되었고,
+  2026-01-01 부터 발송 요청이 브랜드메시지(자유형)로 자동 대체 발송됩니다.
+  관련 API 에 각 언어의 표준 deprecation 표기를 달았습니다.
+- 자유 본문 타입(`FT`/`FI`/`FW`)의 개별 발송 경로는 아직 친구톡 API 뿐이라는 점을
+  문서에 명시했습니다 — 브랜드메시지 API 는 그 조합에 `NOT_A_BRAND_MESSAGE` 를 반환합니다.
+- 브랜드메시지 전환 안내와 메시지 타입 1:1 대응표를 README 에 추가했습니다.
 
 ### 1.1.0 (2026-08-11)
 
