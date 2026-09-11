@@ -240,7 +240,96 @@ const sendPromo = () => send({
 사용 예시와 파라미터는 [코어 README](https://github.com/send-go) 와
 [SDK 가이드](https://sendgo.io/ko/sdk) 를 참고하세요.
 
+## 관리 API — 채널·템플릿·발신번호 등록 (v2 전용)
+
+플러그인이 제공하는 클라이언트에 관리 서비스가 그대로 붙어 있습니다.
+**서버에서만** 호출하세요 — 관리 API 도 발송 API 와 같은 키를 씁니다.
+
+| 접근 | 하는 일 | 계정 |
+| --- | --- | --- |
+| `client.kakaoSenders` | 카카오 채널 인증·등록·동기화, 브랜드메시지 M/N 신청 | 기업 |
+| `client.noticeTemplates` | 알림톡 템플릿 CRUD, 검수 요청·취소, 승인 취소, 휴면 해제 | 기업 |
+| `client.brandTemplates` | 브랜드메시지 템플릿 CRUD, 동기화, 가져오기 | 기업 |
+| `client.senderRegistration` | 발신번호 등록 신청, 중복 확인, 유형 안내 | 개인·기업 |
+| `client.messageTemplates` | 문자 상용구 템플릿 CRUD | 개인·기업 |
+| `client.kakaoImages` | 카카오 이미지 업로드 — 템플릿용 URL 발급 | 기업 |
+| `client.rejectedNumbers` | 수신거부(080) 번호 조회 | 개인·기업 |
+| `client.webhook` | 이벤트 웹훅 구독 — 심사 결과 수신 | 개인·기업 |
+
+> **sendgo.io 콘솔에 들어올 일이 없습니다.** 휴대폰 발신번호는 PASS 대신
+> 신분증 사본을 받아 sendgo 운영자가 대신 심사합니다. 사람이 개입하는 지점은
+> 카카오 채널 인증번호 하나뿐이고, 그것도 여러분 화면에서 입력받으면 됩니다.
+> 심사가 붙는 것들은 비동기라 웹훅으로 결과를 받으세요.
+
+```ts
+// server/api/onboarding/channel-code.post.ts (Nuxt)
+import Sendgo from '@sendgo/node';
+
+const sendgo = new Sendgo({
+  accessKey: process.env.SENDGO_ACCESS_KEY!,
+  secretKey: process.env.SENDGO_SECRET_KEY!,
+  apiVersion: 'v2',
+});
+
+export default defineEventHandler(async (event) => {
+  const { yellowId, phone } = await readBody(event);
+
+  // 카카오가 관리자 휴대폰으로 인증번호를 SMS 발송한다 (응답에 번호는 없다)
+  return sendgo.kakaoSenders.requestToken(yellowId, phone);
+});
+```
+
+```ts
+// server/api/onboarding/template.post.ts
+export default defineEventHandler(async (event) => {
+  const { kakaoSenderKey } = await readBody(event);
+
+  const created = await sendgo.noticeTemplates.create({
+    kakaoSenderKey,
+    templateName: '주문 접수 안내',
+    templateContent: '#{name}님, 주문 #{orderNo}이 접수되었습니다.',
+    templateMessageType: 'BA',
+    templateEmphasizeType: 'NONE',
+    categoryCode: '001001',
+    messagePurpose: 'order_delivery',
+    legalBasis: 'transaction',
+    benefitOrigin: 'none',
+    expiryType: 'none',
+    optInReviewConfirmed: true,
+    ctaClearConfirmed: true,
+    policyConfirmed: true,
+  });
+
+  const code = created.data.template.templateCode;
+  await sendgo.noticeTemplates.requestInspection(code);
+
+  return { templateCode: code };
+});
+```
+
+검수 결과는 비동기입니다. Nitro 태스크나 크론에서 `noticeTemplates.sync(code)`
+를 돌려 `inspectionStatus` 가 `APR` 이 되는지 확인하세요.
+
+전체 파라미터는 [@sendgo/node README](https://github.com/send-go/node) 를 참고하세요.
+
+---
+
 ## 변경 사항
+
+### 1.3.0 (2026-09-11)
+
+- **관리 API 노출** — 플러그인이 제공하는 클라이언트에 `kakaoSenders` ·
+  `noticeTemplates` · `brandTemplates` · `senderRegistration` ·
+  `messageTemplates` 가 붙었습니다. 콘솔에서만 되던 채널 등록, 알림톡 템플릿
+  검수 요청, 발신번호 심사 접수를 Nuxt 서버 라우트에서 처리할 수 있습니다.
+- 관리 API 요청 타입을 re-export 했습니다.
+- `@sendgo/node` 를 `^1.3.0` 으로 올렸습니다.
+- **이벤트 웹훅** 추가 — 발신번호 승인, 알림톡 검수 결과, 채널 차단,
+  브랜드메시지 타겟팅 결과를 구독해 받습니다. 서명은 받은 원본 바이트로
+  검증합니다(SDK 에 검증 헬퍼 포함).
+- **카카오 이미지 업로드** 추가 — 브랜드메시지 템플릿의 `imageUrl` 은 카카오가
+  호스팅하는 URL 이어야 하는데, 그 URL 을 얻는 길이 콘솔에만 있었습니다.
+- **수신거부(080) 조회** 추가 — 자기 DB 의 수신 상태를 맞출 수 있습니다.
 
 ### 1.2.1 (2026-08-14)
 
