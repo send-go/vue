@@ -46,3 +46,6 @@ export { SendgoError, WebhookService, WEBHOOK_EVENTS } from '@sendgo/node';
 // 계정 API는 서버 코드에서만 사용합니다.
 export { AccountClient } from '@sendgo/node';
 export type { AccountConfig, AccountResponse, ApiKeyCreateParams, AllowedIpParams } from '@sendgo/node';
+
+export { TemplateFolderService } from '@sendgo/node';
+export type { TemplateFolderType, TemplateFolderListParams, TemplateFolderCreateParams, TemplateFolderAssignParams } from '@sendgo/node';

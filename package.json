@@ -1,6 +1,6 @@
 {
   "name": "@sendgo/vue",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Sendgo Vue.js SDK — 카카오 알림톡/브랜드메시지, SMS/LMS/MMS (Nuxt / Server Routes)",
   "repository": {
     "type": "git",
@@ -35,13 +35,13 @@
   "license": "MIT",
   "peerDependencies": {
     "vue": ">=3.4.0",
-    "@sendgo/node": "^1.4.0"
+    "@sendgo/node": "^1.5.0"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
     "@types/node": "^20.0.0",
     "vue": "^3.4.0",
-    "@sendgo/node": "^1.4.0"
+    "@sendgo/node": "^1.5.0"
   },
   "engines": {"node": ">=18"}
 }

@@ -1,15 +1,14 @@
 name: Publish to npm
 
-# vX.Y.Z 태그 push, GitHub Release 게시, 또는 수동 실행 시 npm 으로 배포합니다.
+# vX.Y.Z 태그 push 또는 수동 실행 시 npm 으로 배포합니다.
 # npm Trusted Publishing(OIDC) 사용 — 장기 토큰 불필요. 프로버넌스 자동 생성.
 # 사전 조건: npmjs.com 각 패키지 설정에 Trusted Publisher(GitHub Actions, 이 repo, publish.yml) 등록.
+# 태그와 Release를 함께 게시해도 중복 배포되지 않도록 태그만 자동 트리거합니다.
 on:
   workflow_dispatch:
   push:
     tags:
       - "v*"
-  release:
-    types: [published]
 
 jobs:
   publish:
