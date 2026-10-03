@@ -49,3 +49,7 @@ export type { AccountConfig, AccountResponse, ApiKeyCreateParams, AllowedIpParam
 
 export { TemplateFolderService } from '@sendgo/node';
 export type { TemplateFolderType, TemplateFolderListParams, TemplateFolderCreateParams, TemplateFolderAssignParams } from '@sendgo/node';
+
+// 이메일 인증정보는 서버에서만 사용합니다.
+export { EmailService } from '@sendgo/node';
+export type { EmailSendParams, EmailResponse, EmailQuery } from '@sendgo/node';
